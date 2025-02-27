@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }) {
     const handleStart = () => setLoading(true);
 
     const handleComplete = () => {
-      setTimeout(() => setLoading(false), 500); // Delay for 1 second
+      setTimeout(() => setLoading(false), 200); // Delay for 1 second
     };
 
     router.events.on("routeChangeStart", handleStart);

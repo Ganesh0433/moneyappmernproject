@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import style from './home.module.css';
@@ -9,6 +9,9 @@ const Login = () => {
     PhoneNumber: '',
     UserPassword: '',
   });
+
+  const [displayPassword, setDisplayPassword] = useState('');
+  const [charTimers, setCharTimers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
@@ -16,7 +19,46 @@ const Login = () => {
 
   const handleLoginChange = (e) => {
     const { name, value } = e.target;
-    setLoginDetails({ ...loginDetails, [name]: value });
+
+    if (name === 'UserPassword') {
+      let newActualPassword = loginDetails.UserPassword;
+      let newDisplayPassword = displayPassword;
+      let newCharTimers = [...charTimers];
+
+      if (value.length > loginDetails.UserPassword.length) {
+        // User added a new character
+        const newChar = value[value.length - 1];
+        newActualPassword += newChar;
+        newDisplayPassword += newChar;
+
+        // Set a timeout for this character
+        const index = newActualPassword.length - 1;
+        const timer = setTimeout(() => {
+          setDisplayPassword((prev) => 
+            prev.substring(0, index) + '*' + prev.substring(index + 1)
+          );
+        }, 500);
+        
+        newCharTimers[index] = timer;
+      } else {
+        // User deleted a character
+        newActualPassword = loginDetails.UserPassword.slice(0, -1);
+        newDisplayPassword = displayPassword.slice(0, -1);
+
+        // Clear the last timeout
+        const lastIndex = newCharTimers.length - 1;
+        if (newCharTimers[lastIndex]) {
+          clearTimeout(newCharTimers[lastIndex]);
+          newCharTimers.pop();
+        }
+      }
+
+      setLoginDetails({ ...loginDetails, UserPassword: newActualPassword });
+      setDisplayPassword(newDisplayPassword);
+      setCharTimers(newCharTimers);
+    } else {
+      setLoginDetails({ ...loginDetails, [name]: value });
+    }
   };
 
   const handleLoginSubmit = async (e) => {
@@ -37,10 +79,9 @@ const Login = () => {
             const user = matches[0].Username;
             localStorage.setItem('token', 'your_token_here');
             setSuccessMessage('Successfully logged in');
-            setLoginDetails({
-              PhoneNumber: '',
-              UserPassword: '',
-            });
+            setLoginDetails({ PhoneNumber: '', UserPassword: '' });
+            setDisplayPassword('');
+            setCharTimers([]);
             router.push(`/home?me=${user}`);
           } else {
             setErrorMessage('Incorrect phone number or password');
@@ -84,9 +125,9 @@ const Login = () => {
             <div className="relative mt-5">
               <h4 className="text-white">Password</h4>
               <input
-                type="password"
+                type="text"
                 name='UserPassword'
-                value={loginDetails.UserPassword}
+                value={displayPassword}
                 className="w-full p-2 mt-2 text-white placeholder-gray-400 bg-white border-none rounded appearance-none focus:outline-none bg-opacity-10"
                 placeholder="Enter your password"
                 onChange={handleLoginChange}

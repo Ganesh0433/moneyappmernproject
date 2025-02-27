@@ -51,18 +51,21 @@ const QRCodeGenerator = () => {
         setLoading(true);
         setProgress(0);
         const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        let hours = now.getHours();
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? 12 : 12;
-        const formattedHours = String(hours).padStart(2, '0');
-        const DateOfDebit = `${day}-${month}-${year}`;
-        const TimeOfDebit = `${formattedHours}:${minutes} ${ampm}`;
-        const { Amount, Message, DateToCredit, TimeToCredit } = details;
+const year = now.getFullYear();
+const month = String(now.getMonth() + 1).padStart(2, '0');
+const day = String(now.getDate()).padStart(2, '0');
+let hours = now.getHours();
+const minutes = String(now.getMinutes()).padStart(2, '0');
+const ampm = hours >= 12 ? 'PM' : 'AM';
+
+hours = hours % 12 || 12; // Correct 12-hour format conversion
+const formattedHours = String(hours).padStart(2, '0');
+
+const DateOfDebit = `${day}-${month}-${year}`;
+const TimeOfDebit = `${formattedHours}:${minutes} ${ampm}`;
+
+const { Amount, Message, DateToCredit, TimeToCredit } = details;
+
 
         function getRandomThreeDigitInt() {
             return Math.floor(Math.random() * 900) + 100;
@@ -151,6 +154,7 @@ const QRCodeGenerator = () => {
                 });
                 if (matches.length > 0) {
                   const emailname = matches[0].Email;
+                  const Nameofperson=matches[0].Name;
               
                   try {
                     const response = await fetch("/api/sendEmail", {
@@ -160,19 +164,30 @@ const QRCodeGenerator = () => {
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({
                         email: emailname,
-                        subject: "Payment Successful",
-                        message: "Thank you! Your payment was successful.",
+                        subject: "Payment Received - Verification in Progress",
+                        message: `
+                      Dear ${Nameofperson},
+                      
+                      Thank you for your payment of ₹${details.Amount}.
+                      Your payment is currently pending. Once
+                      we verify the payment, we will notify
+                      you with an update.
+                      
+                      If you have any questions, feel free to 
+                      contact us.
+                      
+                      Best regards,  
+                      MoneyLock  
+                      `
                       }),
+                      
                     });
                     console.log(emailname)
                     const data = await response.json();
                     if (response.ok) {
-                      alert("✅ Email sent successfully!");
                     } else {
-                      alert(`❌ Failed to send email: ${data.error}`);
                     }
                   } catch (error) {
-                    alert(`⚠️ Error sending email: ${error.message}`);
                   }
                 } else {
                 }

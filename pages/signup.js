@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/router';
 import style from './home.module.css';
 
@@ -14,13 +14,59 @@ const SignUp = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [displayPassword, setDisplayPassword] = useState(''); // For displaying masked password
+    const timeoutRef = useRef(null);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'Name' && /\s/.test(value)) {
             return;
         }
-        setDetails({ ...details, [name]: value });
+
+        if (name === 'Password') {
+            const newValue = e.target.value;
+
+            if (newValue.length > displayPassword.length) {
+                // User typed a new character
+                const newChar = newValue.slice(-1); // Get the last character typed
+                const newPassword = details.Password + newChar; // Append to actual password
+                setDetails((prevDetails) => ({
+                    ...prevDetails,
+                    Password: newPassword,
+                }));
+
+                // Update displayPassword to mask all but the last character
+                const maskedValue = newPassword.slice(0, -1).replace(/./g, '*') + newChar;
+                setDisplayPassword(maskedValue);
+
+                // Clear any existing timeout
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                }
+
+                // Set timeout to fully mask after 500ms
+                timeoutRef.current = setTimeout(() => {
+                    setDisplayPassword(newPassword.replace(/./g, '*'));
+                }, 500);
+            } else if (newValue.length < displayPassword.length) {
+                // User deleted characters
+                const charsToDelete = displayPassword.length - newValue.length;
+                const newPassword = details.Password.slice(0, -charsToDelete); // Remove characters from end
+                setDetails((prevDetails) => ({
+                    ...prevDetails,
+                    Password: newPassword,
+                }));
+
+                // Update displayPassword to fully masked version
+                setDisplayPassword(newPassword.replace(/./g, '*'));
+            }
+        } else {
+            // For other fields, update normally
+            setDetails((prevDetails) => ({
+                ...prevDetails,
+                [name]: value,
+            }));
+        }
     };
 
     const getRandomThreeDigitInt = () => {
@@ -158,8 +204,8 @@ const SignUp = () => {
                             <h4 className="text-white">Password</h4>
                             <input
                                 name='Password'
-                                type="password"
-                                value={details.Password}
+                                type="text"
+                                value={displayPassword} // Use displayPassword for the input value
                                 className="w-full p-2 mt-2 text-white placeholder-gray-400 bg-white border-none rounded appearance-none focus:outline-none bg-opacity-10"
                                 placeholder="Enter your password"
                                 onChange={handleChange}
@@ -169,20 +215,18 @@ const SignUp = () => {
                             {loading ? 'Signing Up...' : 'Submit'}
                         </button>
                         {loading && (
-                    <div className={style.signuploader}></div>
-             
-            )}
-                      {successMessage &&  (
+                            <div className={style.signuploader}></div>
+                        )}
+                        {successMessage && (
                             <div className="p-4 mt-4 text-green-700 bg-green-100 border border-green-400 rounded">
                                 {successMessage}
                             </div>
-                        )}:
-                        {errorMessage  && (
+                        )}
+                        {errorMessage && (
                             <div className="p-4 mt-4 text-red-700 bg-red-100 border border-red-400 rounded">
                                 {errorMessage}
                             </div>
                         )}
-                    
                     </form>
                     <style jsx>{`
                         input[type='number']::-webkit-inner-spin-button,

@@ -77,14 +77,14 @@ function History() {
 
         {!loading && !error && (
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="sticky top-0 z-10 bg-gray-100">
-              <tr>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Transaction ID</th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Debit Date & Time</th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Credit Date & Time</th>
-                <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Amount</th>
-              </tr>
-            </thead>
+            <thead className="sticky top-0  bg-gray-100 shadow">
+      <tr>
+        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Transaction ID</th>
+        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Debit Date & Time</th>
+        <th className="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Credit Date & Time</th>
+        <th className="px-6 py-3 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Amount</th>
+      </tr>
+    </thead>
             <tbody className="divide-y divide-gray-200">
               {store.map((transaction, index) => (
                 <tr key={index} className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}>

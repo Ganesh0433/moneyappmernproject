@@ -129,7 +129,7 @@ function Home() {
 
           <div className={`fixed top-0 left-0 w-96 h-full bg-white shadow-md transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out`}>
   <button className='p-4' onClick={toggleSidebar}>
-    Close
+  <MenuIcon size={24} />
   </button>
 
   <div className='p-4'>
@@ -190,14 +190,14 @@ function Home() {
                 <div className='overflow-x-auto'>
                   <div className='overflow-y-scroll max-h-60'>
                     <table className='min-w-full divide-y divide-gray-200'>
-                      <thead className='bg-gray-100'>
-                        <tr>
-                          <th className='px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>Transaction ID</th>
-                          <th className='px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>Date & Time</th>
-                          <th className='px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase'>Amount</th>
-                          <th className='px-4 py-2 text-xs font-medium tracking-wider text-right text-gray-500 uppercase'>Status</th>
-                        </tr>
-                      </thead>
+                    <thead className="bg-gray-100 sticky top-0 z-10">
+      <tr>
+        <th className="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Transaction ID</th>
+        <th className="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Date & Time</th>
+        <th className="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Amount</th>
+        <th className="px-4 py-2 text-xs font-medium tracking-wider text-right text-gray-500 uppercase">Status</th>
+      </tr>
+    </thead>
                       <tbody className='divide-y divide-gray-200'>
                         {store.length > 1 && status ? (
                           Object.values(store[1]).reverse().map((transaction, index) => (
